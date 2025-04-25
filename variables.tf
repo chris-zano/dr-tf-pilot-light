@@ -30,5 +30,10 @@ variable "failover_certificate_arn" {
 }
 
 variable "db_port" {
-  type = number
+  type    = number
+  default = 5432
+}
+
+variable "domain_name" {
+  type = string
 }

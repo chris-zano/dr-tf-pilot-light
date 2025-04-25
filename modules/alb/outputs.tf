@@ -13,3 +13,7 @@ output "launch_template_id" {
 output "asg_name" {
   value = aws_autoscaling_group.main.name
 }
+
+output "alb_zone_id" {
+  value = aws_lb.main.zone_id
+}

@@ -5,5 +5,5 @@ provider "aws" {
 
 provider "aws" {
   alias  = "failover"
-  region = "eu-central-1"
+  region = "us-east-1"
 }

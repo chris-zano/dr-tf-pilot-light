@@ -11,7 +11,7 @@ resource "aws_lb" "main" {
   name               = "example-alb"
   internal           = false
   load_balancer_type = "application"
-  security_groups    = var.security_group_ids
+  security_groups    = var.alb_security_group_ids
   subnets            = var.subnet_ids
 }
 
@@ -20,6 +20,7 @@ resource "aws_lb_target_group" "main" {
   port     = 80
   protocol = "HTTP"
   vpc_id   = var.vpc_id
+  
   target_type = "instance"
 }
 
@@ -66,7 +67,7 @@ resource "aws_launch_template" "main" {
 
   network_interfaces {
     associate_public_ip_address = true
-    security_groups             = var.security_group_ids
+    security_groups             = var.ec2_security_group_ids
   }
 
   metadata_options {
@@ -97,23 +98,35 @@ resource "aws_launch_template" "main" {
 
     # Add current user to the docker group (non-root Docker use)
     usermod -aG docker ubuntu
+    
+    newgrp docker
 
     # Set environment variables from RDS
-    DB_HOST="${var.db_endpoint}"
+    DB_HOST="${var.db_host}"
     DB_PORT="${var.db_port}"
     DB_NAME="${var.db_dbname}"
     DB_USER="${var.db_username}"
     DB_PASSWORD="${var.db_password}"
 
+    echo "DB_HOST: $DB_HOST"
+    echo "DB_PORT: $DB_PORT"
+    echo "DB_NAME: $DB_NAME"
+    echo "DB_USER: $DB_USER"
+    echo "DB_PASSWORD: $DB_PASSWORD"
+
     # Pull and run the custom PHP server Docker image
     docker pull chrisncs/php-server
-    docker run -d -p 443:80 \
+    echo "starting container"
+    docker run -d -p 80:80 \
       -e DB_HOST=$DB_HOST \
       -e DB_PORT=$DB_PORT \
       -e DB_NAME=$DB_NAME \
       -e DB_USER=$DB_USER \
       -e DB_PASSWORD=$DB_PASSWORD \
       chrisncs/php-server
+    
+    echo "running docker ps"
+    docker ps
   EOF
   )
 }

@@ -8,7 +8,7 @@ terraform {
 
 # create alb security group
 resource "aws_security_group" "alb_sg" {
-  name        = "alb security group"
+  name        = "alb-sg"
   description = "Enable https and http on Port (80 and 443)"
   vpc_id      = var.vpc_id
 }

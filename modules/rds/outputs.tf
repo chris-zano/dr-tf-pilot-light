@@ -9,3 +9,11 @@ output "source_db_arn" {
 output "db_endpoint" {
   value = aws_db_instance.postgres.endpoint
 }
+
+output "db_port" {
+  value = aws_db_instance.postgres.port
+}
+
+output "db_hostname" {
+  value = aws_db_instance.postgres.address
+}
