@@ -37,3 +37,19 @@ variable "db_port" {
 variable "domain_name" {
   type = string
 }
+
+variable "iam_user_name" {
+  type = string
+}
+
+variable "application_port" {
+  type = number
+}
+
+variable "primary_s3_region" {
+  type = string
+}
+
+variable "failover_s3_region" {
+  type = string
+}

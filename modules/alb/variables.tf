@@ -45,3 +45,15 @@ variable "max_size" {
 variable "desired_capacity" {
   type = number
 }
+
+variable "secret_manager_name" {
+  type = string
+}
+
+variable "secret_manager_region" {
+  type = string
+}
+
+variable "iam_instance_profile_name" {
+  type = string
+}

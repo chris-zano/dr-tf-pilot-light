@@ -146,13 +146,7 @@ resource "aws_iam_role_policy" "replication_policy" {
       {
         Effect = "Allow"
         Action = [
-          "s3:ReplicateObject",
-          "s3:ReplicateDelete",
-          "s3:ReplicateTags",
-          "s3:PutObjectRetention",
-          "s3:PutObjectLegalHold",
-          "s3:PutObjectAcl",
-          "s3:PutObject"
+          "s3:*",
         ]
         Resource = "${aws_s3_bucket.replica.arn}/*"
       }

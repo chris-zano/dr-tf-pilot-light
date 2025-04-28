@@ -63,6 +63,59 @@ module "rds-failover-replica" {
   db_security_group = [module.failover-sg.db_sg_id]
   private_subnets   = module.failover-vpc.private_subnets
   source_db_arn     = module.primary-rds.source_db_arn
+  depends_on = [ module.primary-rds ]
+}
+
+# create s3 bucket
+module "s3" {
+  source = "./modules/s3"
+}
+
+module "iam_s3_full_access" {
+  source = "./modules/iam"
+  user_name = var.iam_user_name
+  tags = {
+    Name = "S3 Full Access"
+  }
+}
+
+# create secrets manager
+module "primary-secrets" {
+  source = "./modules/secrets_manager"
+  providers = {
+    aws = aws.primary
+  }
+  secretmanager_name = "primary-secrets-manager-03"
+  access_key_id = module.iam_s3_full_access.access_key_id
+  secret_access_key = module.iam_s3_full_access.secret_access_key
+  db_host = module.primary-rds.db_hostname
+  db_name = var.db_name
+  db_password = var.db_password
+  db_port = module.primary-rds.db_port
+  db_username = var.db_username
+  port = var.application_port
+  s3_bucket_name = module.s3.bucket_name
+  s3_region = var.primary_s3_region
+  depends_on = [ module.primary-rds, module.s3, module.iam_s3_full_access ]
+}
+
+module "failover-secrets" {
+  source = "./modules/secrets_manager"
+  providers = {
+    aws = aws.failover
+  }
+  secretmanager_name = "failover-secrets-manager-03"
+  access_key_id = module.iam_s3_full_access.access_key_id
+  secret_access_key = module.iam_s3_full_access.secret_access_key
+  db_host = module.rds-failover-replica.db_hostname
+  db_name = var.db_name
+  db_password = var.db_password
+  db_port = module.rds-failover-replica.db_port
+  db_username = var.db_username
+  port = var.application_port
+  s3_bucket_name = module.s3.replica_bucket_name
+  s3_region = var.failover_s3_region
+  depends_on = [ module.s3, module.rds-failover-replica, module.iam_s3_full_access ]
 }
 
 module "primary-alb-asg" {
@@ -80,12 +133,15 @@ module "primary-alb-asg" {
   db_dbname              = var.db_name
   db_password            = var.db_password
   db_username            = var.db_username
-  depends_on             = [module.primary-rds]
   db_endpoint            = module.primary-rds.db_endpoint
   db_port                = module.primary-rds.db_port
   desired_capacity       = 1
   max_size               = 2
   min_size               = 1
+  secret_manager_name = module.primary-secrets.secret_name
+  secret_manager_region = var.primary_s3_region
+  iam_instance_profile_name = module.iam_s3_full_access.iam_instance_profile_name
+  depends_on = [module.primary-secrets]
 }
 
 module "failover-alb-asg" {
@@ -103,12 +159,15 @@ module "failover-alb-asg" {
   db_dbname              = var.db_name
   db_password            = var.db_password
   db_username            = var.db_username
-  depends_on             = [module.rds-failover-replica]
   db_endpoint            = module.rds-failover-replica.db_endpoint
   db_port                = module.rds-failover-replica.db_port
   desired_capacity       = 0
   max_size               = 0
   min_size               = 0
+  secret_manager_name = module.failover-secrets.secret_name
+  secret_manager_region = var.failover_s3_region
+  iam_instance_profile_name = module.iam_s3_full_access.iam_instance_profile_name
+  depends_on = [ module.failover-secrets ]
 }
 
 module "dns" {

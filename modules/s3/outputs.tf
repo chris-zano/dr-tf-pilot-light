@@ -9,3 +9,7 @@ output "s3_bucket_arn" {
 output "bucket_name" {
     value = aws_s3_bucket.source.bucket
 }
+
+output "replica_bucket_name" {
+  value = aws_s3_bucket.replica.bucket
+}
