@@ -104,7 +104,7 @@ module "failover-secrets" {
   providers = {
     aws = aws.failover
   }
-  secretmanager_name = "failover-secrets-manager-03"
+  secretmanager_name = "failover-secrets-manager-04"
   access_key_id = module.iam_s3_full_access.access_key_id
   secret_access_key = module.iam_s3_full_access.secret_access_key
   db_host = module.rds-failover-replica.db_hostname

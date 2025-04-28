@@ -65,5 +65,3 @@ resource "aws_iam_instance_profile" "ec2_profile" {
   name_prefix = "ec2-app-profile-"
   role        = aws_iam_role.ec2_role.name
 }
-
-
