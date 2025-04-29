@@ -85,7 +85,7 @@ module "primary-secrets" {
   providers = {
     aws = aws.primary
   }
-  secretmanager_name = "secrets_manager_primary-01"
+  secretmanager_name = "secrets_manager_primary-02"
   access_key_id      = module.iam_s3_full_access.access_key_id
   secret_access_key  = module.iam_s3_full_access.secret_access_key
   db_host            = module.primary-rds.db_hostname
@@ -104,7 +104,7 @@ module "failover-secrets" {
   providers = {
     aws = aws.failover
   }
-  secretmanager_name = "secrets_manager_primary-02"
+  secretmanager_name = "secrets_manager_primary-03"
   access_key_id      = module.iam_s3_full_access.access_key_id
   secret_access_key  = module.iam_s3_full_access.secret_access_key
   db_host            = module.rds-failover-replica.db_hostname
