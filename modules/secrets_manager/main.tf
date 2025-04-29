@@ -8,6 +8,9 @@ terraform {
 
 resource "aws_secretsmanager_secret" "my_secret" {
   name = var.secretmanager_name
+  lifecycle {
+    prevent_destroy = false
+  }
 }
 
 resource "aws_secretsmanager_secret_version" "my_secret_version" {
@@ -24,4 +27,7 @@ resource "aws_secretsmanager_secret_version" "my_secret_version" {
     db_port = var.db_port
     port = var.port
   })
+  lifecycle {
+    prevent_destroy = false
+  }
 }
